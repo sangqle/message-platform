@@ -1,0 +1,1 @@
+namespace java com.cabin.keygen.thrift
