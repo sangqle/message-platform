@@ -18,7 +18,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -104,9 +103,18 @@ public class WebsocketHandler extends TextWebSocketHandler {
     }
 
     public void sendMessageToUserId(long userId, MessageDTO messageDTO) throws IOException {
+        /**
+         * 1. Save message to db
+         * 2. Forward message to kafka
+         * 3. Send message to client via websocket
+         */
+
+        System.err.println("Sent message to client: " + messageDTO.toString());
+
         TextMessage textMessage = new TextMessage(messageDTO.toString());
         Optional<User> byId = userRepository.findById(String.valueOf(userId));
         User user = byId.get();
+        String server = user.getServer();
         WebSocketSession webSocketSession = sessions.get(user.getSession());
         webSocketSession.sendMessage(textMessage);
     }
