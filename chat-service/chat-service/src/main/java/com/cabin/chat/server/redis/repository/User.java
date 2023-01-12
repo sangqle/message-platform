@@ -15,8 +15,9 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     @Id
-    private String userId;
+    private Long userId;
     private String session;
     private String server;
+    private String topic;
     private Long createdAt;
 }

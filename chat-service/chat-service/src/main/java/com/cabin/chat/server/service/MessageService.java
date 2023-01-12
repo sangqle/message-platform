@@ -16,11 +16,13 @@ public class MessageService {
         try {
             MessageDTO messageDto = new MessageDTO();
             messageDto.setMessage(message.getMsg());
-            websocketHandler.sendMessageToUserId(276260728L, messageDto);
+            messageDto.setRecipientUserId(message.getRecipientUserId());
+            messageDto.setAuthorUserId(message.getAuthorUserId());
+            messageDto.setReplyMessageId(message.getReplyMessageId());
+
+            websocketHandler.sendMessageToUserId(messageDto);
         } catch (Exception ex) {
             System.err.println(ex);
         }
-
     }
-
 }

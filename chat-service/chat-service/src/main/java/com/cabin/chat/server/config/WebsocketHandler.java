@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Slf4j
 public class WebsocketHandler extends TextWebSocketHandler {
-    private Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private ObjectWriter objectWriter;
 
     @Autowired
@@ -34,6 +34,9 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
     @Value("${server.websocket.name}")
     String serverAddress;
+
+    @Value("${server.kafka.topic.name}")
+    String kafkaTopic;
 
     public WebsocketHandler(ObjectMapper objectMapper) {
         this.objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
@@ -70,16 +73,16 @@ public class WebsocketHandler extends TextWebSocketHandler {
             return;
         }
 
-        String bearer = authorizations.get(0);
-        String token = bearer.substring(7);
+        long userIdFromSession = getUserIdFromSession(session);
 
         // save current session of user to user mapping service
         User user = new User();
-        user.setUserId(token);
+        user.setUserId(userIdFromSession);
         user.setServer(serverAddress);
+        user.setTopic(kafkaTopic);
         user.setSession(session.getId());
         userRepository.save(user);
-        sessions.put(session.getId(), session);
+        sessions.put(user.getUserId(), session);
     }
 
     @Override
@@ -102,20 +105,16 @@ public class WebsocketHandler extends TextWebSocketHandler {
         userRepository.deleteById(String.valueOf(userIdFromSession));
     }
 
-    public void sendMessageToUserId(long userId, MessageDTO messageDTO) throws IOException {
+    public void sendMessageToUserId(MessageDTO messageDTO) throws IOException {
         /**
          * 1. Save message to db
          * 2. Forward message to kafka
          * 3. Send message to client via websocket
          */
-
-        System.err.println("Sent message to client: " + messageDTO.toString());
-
+        log.info("Sent message to client: " + messageDTO.toString());
+        long userId = messageDTO.getRecipientUserId();
         TextMessage textMessage = new TextMessage(messageDTO.toString());
-        Optional<User> byId = userRepository.findById(String.valueOf(userId));
-        User user = byId.get();
-        String server = user.getServer();
-        WebSocketSession webSocketSession = sessions.get(user.getSession());
+        WebSocketSession webSocketSession = sessions.get(userId);
         webSocketSession.sendMessage(textMessage);
     }
 

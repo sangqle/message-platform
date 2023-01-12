@@ -1,7 +1,5 @@
 package com.cabin.chat.server.config.kafka;
 
-import com.cabin.chat.server.config.WebsocketHandler;
-import com.cabin.chat.server.dto.MessageDTO;
 import com.cabin.chat.server.entity.KafkaMessage;
 import com.cabin.chat.server.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +12,10 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class MyMessageConsumer {
-
     @Autowired
     MessageService messageService;
 
-    @KafkaListener(topicPattern = "message-topic", groupId = "message-group")
+    @KafkaListener(topics = {"${server.kafka.topic.name}"}, groupId = "${spring.kafka.groupId}")
     public void kafkaMessageListener(KafkaMessage kafkaMessage) throws IOException {
         messageService.sendMessageToClient(kafkaMessage);
     }

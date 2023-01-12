@@ -12,5 +12,9 @@ import lombok.Setter;
 public class KafkaMessage {
     private String msg;
     private String server;
+    private long recipientUserId;
+    private long authorUserId;
+
+    private String replyMessageId;
 
 }
