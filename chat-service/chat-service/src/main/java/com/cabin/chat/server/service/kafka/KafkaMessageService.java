@@ -4,8 +4,8 @@ import com.cabin.chat.server.config.WebsocketHandler;
 import com.cabin.chat.server.constant.MessageStatus;
 import com.cabin.chat.server.dto.MessageDTO;
 import com.cabin.chat.server.entity.KafkaMessage;
-import com.cabin.chat.server.redis.repository.User;
-import com.cabin.chat.server.service.UserService;
+import com.cabin.chat.server.entity.redis.User;
+import com.cabin.chat.server.service.redis.UserMappingService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Slf4j
 public class KafkaMessageService {
     @Autowired
-    UserService userService;
+    UserMappingService userService;
 
     @Autowired
     WebsocketHandler websocketHandler;

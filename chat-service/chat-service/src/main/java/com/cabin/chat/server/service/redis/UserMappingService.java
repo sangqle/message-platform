@@ -1,14 +1,14 @@
-package com.cabin.chat.server.service;
+package com.cabin.chat.server.service.redis;
 
-import com.cabin.chat.server.redis.repository.User;
-import com.cabin.chat.server.redis.repository.UserRepository;
+import com.cabin.chat.server.entity.redis.User;
+import com.cabin.chat.server.repository.redis.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserMappingService {
     @Autowired
     UserRepository userRepository;
 

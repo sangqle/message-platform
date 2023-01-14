@@ -1,5 +1,6 @@
-package com.cabin.chat.server.config;
+package com.cabin.chat.server.config.websocket;
 
+import com.cabin.chat.server.config.WebsocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

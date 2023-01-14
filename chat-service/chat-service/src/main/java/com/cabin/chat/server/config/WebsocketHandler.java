@@ -1,8 +1,8 @@
 package com.cabin.chat.server.config;
 
 import com.cabin.chat.server.dto.MessageDTO;
-import com.cabin.chat.server.redis.repository.User;
-import com.cabin.chat.server.redis.repository.UserRepository;
+import com.cabin.chat.server.entity.redis.User;
+import com.cabin.chat.server.repository.redis.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.extern.slf4j.Slf4j;

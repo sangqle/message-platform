@@ -1,4 +1,4 @@
-package com.cabin.chat.server.redis.repository;
+package com.cabin.chat.server.entity.redis;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
