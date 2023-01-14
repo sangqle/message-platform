@@ -1,5 +1,6 @@
 package com.cabin.chat.server.dto;
 
+import com.cabin.chat.server.constant.MessageStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -18,6 +19,7 @@ public class MessageDTO {
     private long authorUserId;
     private String replyMessageId;
     private long createdAt;
+    private MessageStatus status;
 
     @Override
     public String toString() {

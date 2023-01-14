@@ -1,71 +1,87 @@
 package com.cabin.chat.server.controller;
 
-import com.cabin.chat.server.config.WebsocketHandler;
 import com.cabin.chat.server.dto.MessageDTO;
+import com.cabin.chat.server.dto.MessageSentResponse;
 import com.cabin.chat.server.entity.KafkaMessage;
-import com.cabin.chat.server.redis.repository.User;
-import com.cabin.chat.server.service.MessageService;
-import com.cabin.chat.server.service.UserService;
+import com.cabin.chat.server.entity.cassandra.Message;
+import com.cabin.chat.server.entity.cassandra.Post;
+import com.cabin.chat.server.repository.cassandra.MessageRepository;
+import com.cabin.chat.server.repository.cassandra.PostRepository;
+import com.cabin.chat.server.service.kafka.KafkaMessageService;
+import com.cabin.chat.server.service.cassandra.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @RestController
 public class AppController {
-    @Autowired
-    WebsocketHandler websocketHandler;
 
     @Autowired
-    UserService userService;
-
-    @Autowired
-    MessageService messageService;
-
+    KafkaMessageService kafkaMessageService;
 
     @Autowired
     private KafkaTemplate<String, KafkaMessage> kafkaTemplate;
 
-    @PostMapping("/message")
-    public MessageDTO postMessage(@RequestBody MessageDTO messageDTO) throws IOException {
+    @Autowired
+    MessageService messageService;
 
+    @Autowired
+    PostRepository postRepository;
+
+    @Autowired
+    MessageRepository messageRepository;
+
+    @PostMapping("/message")
+    public MessageSentResponse postMessage(@RequestBody MessageDTO messageDTO) throws IOException {
+        MessageSentResponse response = new MessageSentResponse();
         // get userInfo from redis
-        User userInfo = userService.getUserInfo(messageDTO.getRecipientUserId());
-        if(userInfo == null) {
-            System.err.println("Can not get userInfo");
-            return null;
-        }
-        KafkaMessage message = new KafkaMessage();
-        message.setMsg(messageDTO.getMessage());
-        message.setServer(userInfo.getServer());
-        message.setAuthorUserId(messageDTO.getAuthorUserId());
+        Message message = new Message();
+        message.setContent(messageDTO.getMessage());
         message.setReplyMessageId(messageDTO.getReplyMessageId());
+        message.setAuthorUserId(messageDTO.getAuthorUserId());
         message.setRecipientUserId(messageDTO.getRecipientUserId());
 
-        String kafkaTopic = userInfo.getTopic();
-        log.info(String.format("Send message to user: %s, topic: %s", userInfo.getUserId(), kafkaTopic));
+        Mono<Message> save = messageRepository.save(message);
+        Message block = save.block();
+        System.err.println(block.toString());
 
-        ListenableFuture<SendResult<String, KafkaMessage>> future =
-            kafkaTemplate.send(kafkaTopic, message);
-
-        future.addCallback(new ListenableFutureCallback<SendResult<String, KafkaMessage>>() {
-            @Override
-            public void onSuccess(SendResult<String, KafkaMessage> result) {
-                System.out.println("Sent message=[" + message +
-                    "] with offset=[" + result.getRecordMetadata().offset() + "]");
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                System.out.println("Unable to send message=["
-                    + message + "] due to : " + ex.getMessage());
-            }
-        });
-        return  messageDTO;
+        KafkaMessage kafkaMessage = kafkaMessageService.producerMessage(messageDTO);
+        if (kafkaMessage == null) {
+            response.setError(-1);
+        } else {
+            response.setMessage(messageDTO);
+            response.setStatus(kafkaMessage.getStatus());
+        }
+        return response;
     }
+
+    @GetMapping("/messages")
+    public Flux<Message> getMessages() {
+        return messageService.getMessages();
+    }
+
+    @GetMapping("/posts")
+    public Flux<Post> all() {
+        return postRepository.findAll();
+    }
+    @PostMapping("/posts")
+    public Post createPost() {
+        Post post = new Post();
+        post.setContent("new Post");
+        post.setTitle("title of post");
+
+        Mono<Post> save = postRepository.save(post);
+        Optional<Post> post1 = save.blockOptional();
+        Post post2 = post1.get();
+
+        return post2;
+    }
+
 }

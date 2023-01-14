@@ -1,5 +1,6 @@
 package com.cabin.chat.server.entity;
 
+import com.cabin.chat.server.constant.MessageStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +17,6 @@ public class KafkaMessage {
     private long authorUserId;
 
     private String replyMessageId;
+    private MessageStatus status;
 
 }
