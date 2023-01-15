@@ -21,6 +21,8 @@ public class Message {
     @PrimaryKey()
     @Builder.Default
     private String id = UUID.randomUUID().toString();
+
+    private String conversationId;
     private String content;
     private long recipientUserId;
     private long authorUserId;

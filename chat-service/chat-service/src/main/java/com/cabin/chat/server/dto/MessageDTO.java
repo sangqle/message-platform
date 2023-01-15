@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MessageDTO {
     private String message;
+    private String conversationId;
     private long recipientUserId;
     private long authorUserId;
     private String replyMessageId;
