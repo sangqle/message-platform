@@ -22,6 +22,9 @@ public class CassandraConfig extends AbstractReactiveCassandraConfiguration {
     @Value("${spring.data.cassandra.contact-points}")
     String contactPoints;
 
+    @Value("${spring.data.cassandra.local-datacenter}")
+    String datacenter;
+
     @Override
     protected List<CreateKeyspaceSpecification> getKeyspaceCreations() {
 
@@ -53,4 +56,8 @@ public class CassandraConfig extends AbstractReactiveCassandraConfiguration {
         return SchemaAction.CREATE_IF_NOT_EXISTS;
     }
 
+    @Override
+    protected String getLocalDataCenter() {
+        return datacenter;
+    }
 }

@@ -8,9 +8,14 @@ And some refer from [ACE-the system interview design](https://towardsdatascience
 
 # How to start (may be later)
 ## Setup docker
+### Setup Cassandra
 ```code
+./setup-config.sh
 ```
-
+Run docker compose Cassandra
+```code
+docker-compose up
+```
 ## Run Spring boot project
 
 ```code
