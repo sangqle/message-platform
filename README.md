@@ -7,12 +7,22 @@ And some refer from [ACE-the system interview design](https://towardsdatascience
 ![architecture flow](assets/message-architecture.png)
 
 # How to start (may be later)
-## Setup docker
-### Setup Cassandra
+## Setup Docker
+In root directory
+### Setup Redis for User Mapping Service
+```bash
+docker run -d --name some-redis -p 6379:6379 redis
+```
+
+### Setup Mysql for User Service (maybe use later, this is optional)
+```bash
+docker run --name jmysql -e MYSQL_ROOT_PASSWORD=root -p 3307:3306 -d mysql:latest
+```
+### Setup Cassandra for message service
 ```code
 ./setup-config.sh
 ```
-Run docker compose Cassandra
+Run docker compose Cassandra it will be create 3 node as docker-compsose define
 ```code
 docker-compose up
 ```
